@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perspective Cube - See Your Question from All Sides</title>
+    <meta name="description" content="Explore your questions and decisions from 6 different perspectives with quantum thinking technology.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        function RotateCw({ className, style }) {
+            return <svg className={className} style={style} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>;
+        }
+        function X({ className }) {
+            return <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>;
+        }
+        function Sparkles({ className }) {
+            return <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>;
+        }
+
+        function PerspectiveCube() {
+            const [stage, setStage] = useState('start');
+            const [question, setQuestion] = useState('');
+            const [answer, setAnswer] = useState('');
+            const [currentFaceIndex, setCurrentFaceIndex] = useState(0);
+            const [isRotating, setIsRotating] = useState(false);
+
+            const faces = [
+                { id: 'facts', title: 'FACTS', question: 'What has already happened or is definitely known in this situation?', color: '#00F5FF', gradient: 'from-cyan-500/30 to-blue-500/30', glow: '#00F5FF' },
+                { id: 'fear', title: 'FEAR', question: 'What scares you here or makes you delay?', color: '#FF00FF', gradient: 'from-fuchsia-500/30 to-purple-500/30', glow: '#FF00FF' },
+                { id: 'cost', title: 'COST', question: 'What will you actually sacrifice or risk if you choose this path?', color: '#FFD700', gradient: 'from-yellow-500/30 to-orange-500/30', glow: '#FFD700' },
+                { id: 'alternative', title: 'ALTERNATIVE', question: 'What option are you currently ignoring or unwilling to consider?', color: '#00FF88', gradient: 'from-emerald-500/30 to-green-500/30', glow: '#00FF88' },
+                { id: 'time', title: 'TIME', question: 'How will you look at this decision in a year?', color: '#8B00FF', gradient: 'from-violet-500/30 to-indigo-500/30', glow: '#8B00FF' },
+                { id: 'honesty', title: 'HONESTY', question: 'What decision would you make if you stopped making excuses?', color: '#FF1744', gradient: 'from-red-500/30 to-rose-500/30', glow: '#FF1744' }
+            ];
+
+            const currentFace = faces[currentFaceIndex];
+
+            const handleStart = () => {
+                if (!question.trim()) return;
+                setIsRotating(true);
+                setTimeout(() => { setStage('face'); setIsRotating(false); }, 2000);
+            };
+
+            const rotateCube = () => {
+                setIsRotating(true);
+                setAnswer('');
+                setTimeout(() => {
+                    if (currentFaceIndex < faces.length - 1) {
+                        setCurrentFaceIndex(currentFaceIndex + 1);
+                        setStage('face');
+                    } else {
+                        setStage('end');
+                    }
+                    setIsRotating(false);
+                }, 1500);
+            };
+
+            if (stage === 'start') {
+                return (
+                    <div className="min-h-screen bg-black relative overflow-hidden flex items-center justify-center p-6">
+                        <div className="absolute inset-0">
+                            <div className="absolute top-20 left-20 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
+                            <div className="absolute bottom-20 right-20 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl animate-pulse" style={{animationDelay:'1s'}}></div>
+                            <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-pink-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay:'2s'}}></div>
+                        </div>
+                        <div className="absolute inset-0 bg-[linear-gradient(rgba(0,245,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,245,255,0.03)_1px,transparent_1px)] bg-[size:50px_50px]"></div>
+                        <div className="relative w-full max-w-3xl z-10">
+                            <div className="text-center mb-16">
+                                <div className="inline-block mb-8 relative">
+                                    <div className="w-32 h-32 relative">
+                                        {[0,1,2].map((i) => (
+                                            <div key={i} className="absolute inset-0 rounded-2xl animate-pulse" style={{
+                                                background: `conic-gradient(from ${i*120}deg, #00F5FF, #FF00FF, #00FF88, #00F5FF)`,
+                                                filter: `blur(${20+i*10}px)`, opacity: 0.3-i*0.1, animationDelay: `${i*0.3}s`
+                                            }}></div>
+                                        ))}
+                                        <div className="relative w-full h-full bg-gradient-to-br from-cyan-500/20 to-purple-500/20 backdrop-blur-xl rounded-2xl border border-cyan-500/30 flex items-center justify-center shadow-2xl">
+                                            <RotateCw className="w-16 h-16 text-cyan-400" style={{filter:'drop-shadow(0 0 10px #00F5FF)', animation:'spin 4s linear infinite'}} />
+                                        </div>
+                                    </div>
+                                </div>
+                                <h1 className="text-7xl font-black mb-4 tracking-tight">
+                                    <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 text-transparent bg-clip-text">PERSPECTIVE</span>
+                                    <br /><span className="text-white">CUBE</span>
+                                </h1>
+                                <p className="text-xl text-gray-400 font-light">Explore your question from <span className="text-cyan-400">6 dimensions</span></p>
+                            </div>
+                            <div className="relative">
+                                <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 rounded-3xl blur-xl"></div>
+                                <div className="relative bg-black/40 backdrop-blur-2xl rounded-3xl p-8 border border-cyan-500/30 shadow-2xl">
+                                    <div className="flex items-center gap-3 mb-4">
+                                        <Sparkles className="w-5 h-5 text-cyan-400" />
+                                        <label className="text-white text-lg font-bold tracking-wide">ENTER YOUR QUESTION</label>
+                                    </div>
+                                    <textarea value={question} onChange={(e)=>setQuestion(e.target.value)} placeholder="What situation or decision are you facing?" className="w-full h-32 px-6 py-4 bg-white/5 border-2 border-cyan-500/20 rounded-2xl text-white placeholder-gray-500 focus:border-cyan-500 focus:outline-none transition resize-none text-lg font-light" style={{textShadow:'0 0 10px rgba(0,245,255,0.5)'}} />
+                                    <div className="mt-6">
+                                        <button onClick={handleStart} disabled={!question.trim()} className="group w-full relative px-8 py-5 rounded-2xl font-bold text-xl transition-all disabled:opacity-30 disabled:cursor-not-allowed overflow-hidden" style={{
+                                            background: question.trim() ? 'linear-gradient(135deg, #00F5FF 0%, #FF00FF 100%)' : 'rgba(255,255,255,0.1)',
+                                            boxShadow: question.trim() ? '0 0 40px rgba(0,245,255,0.6), 0 0 80px rgba(255,0,255,0.4)' : 'none'
+                                        }}>
+                                            <span className="relative z-10 flex items-center justify-center gap-3 text-black font-black tracking-wide">
+                                                <RotateCw className="w-6 h-6" />ACTIVATE CUBE
+                                            </span>
+                                            {question.trim() && <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="mt-8 flex items-center justify-center gap-2 text-gray-600 text-sm">
+                                <div className="w-1 h-1 rounded-full bg-cyan-400 animate-pulse"></div>
+                                <span>QUANTUM PERSPECTIVE TECHNOLOGY</span>
+                                <div className="w-1 h-1 rounded-full bg-cyan-400 animate-pulse"></div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            if (isRotating) {
+                return (
+                    <div className="min-h-screen bg-black flex items-center justify-center relative overflow-hidden">
+                        <div className="absolute inset-0">
+                            <div className="absolute top-1/3 left-1/4 w-96 h-96 bg-cyan-500/30 rounded-full blur-3xl animate-pulse"></div>
+                            <div className="absolute bottom-1/3 right-1/4 w-96 h-96 bg-purple-500/30 rounded-full blur-3xl animate-pulse" style={{animationDelay:'0.5s'}}></div>
+                        </div>
+                        <div className="relative z-10 text-center">
+                            <div className="w-40 h-40 mx-auto mb-8 relative">
+                                <div className="absolute inset-0 rounded-3xl animate-spin" style={{
+                                    background: 'conic-gradient(from 0deg, #00F5FF, #FF00FF, #00FF88, #FFD700, #8B00FF, #FF1744, #00F5FF)',
+                                    animationDuration: '1.5s', filter: 'blur(20px)', opacity: 0.6
+                                }}></div>
+                                <div className="relative w-full h-full rounded-3xl flex items-center justify-center animate-spin" style={{
+                                    background: 'linear-gradient(135deg, rgba(0,245,255,0.3), rgba(255,0,255,0.3))',
+                                    backdropFilter: 'blur(20px)', border: '2px solid rgba(0,245,255,0.5)', animationDuration: '1.5s'
+                                }}>
+                                    <RotateCw className="w-16 h-16 text-cyan-400" />
+                                </div>
+                            </div>
+                            <p className="text-3xl text-white font-bold mb-2 animate-pulse" style={{textShadow:'0 0 20px rgba(0,245,255,0.8)'}}>ROTATING CUBE</p>
+                            <p className="text-cyan-400 text-sm font-mono">{stage === 'start' ? 'INITIALIZING...' : `DIMENSION ${currentFaceIndex + 1}/6`}</p>
+                        </div>
+                    </div>
+                );
+            }
+
+            if (stage === 'face' && currentFace) {
+                return (
+                    <div className="min-h-screen bg-black relative overflow-hidden flex items-center justify-center p-6">
+                        <div className="absolute inset-0">
+                            <div className="absolute top-20 right-20 w-96 h-96 rounded-full blur-3xl animate-pulse" style={{backgroundColor:`${currentFace.glow}30`}}></div>
+                            <div className="absolute bottom-20 left-20 w-96 h-96 rounded-full blur-3xl animate-pulse" style={{backgroundColor:`${currentFace.glow}20`,animationDelay:'1s'}}></div>
+                        </div>
+                        <div className="absolute inset-0" style={{
+                            backgroundImage: `linear-gradient(${currentFace.glow}10 1px, transparent 1px), linear-gradient(90deg, ${currentFace.glow}10 1px, transparent 1px)`,
+                            backgroundSize: '50px 50px'
+                        }}></div>
+                        <div className="relative w-full max-w-3xl z-10">
+                            <div className="flex items-center justify-between mb-8">
+                                <div className="flex items-center gap-4">
+                                    <div className="px-5 py-2 bg-black/60 backdrop-blur-sm rounded-full border" style={{borderColor:`${currentFace.glow}40`}}>
+                                        <span className="text-white text-sm font-mono font-bold">DIMENSION {currentFaceIndex + 1} / 6</span>
+                                    </div>
+                                    <div className="flex gap-2">
+                                        {faces.map((f,idx)=>(
+                                            <div key={f.id} className="w-2 h-2 rounded-full transition-all" style={{
+                                                backgroundColor: idx <= currentFaceIndex ? f.color : 'rgba(255,255,255,0.2)',
+                                                boxShadow: idx === currentFaceIndex ? `0 0 10px ${f.color}` : 'none'
+                                            }}></div>
+                                        ))}
+                                    </div>
+                                </div>
+                                <button onClick={()=>setStage('end')} className="p-3 rounded-full bg-black/60 hover:bg-black/80 transition border border-white/20 backdrop-blur-sm">
+                                    <X className="w-5 h-5 text-gray-400" />
+                                </button>
+                            </div>
+                            <div className="mb-6 p-5 bg-black/60 backdrop-blur-sm rounded-2xl border border-white/10">
+                                <div className="text-gray-500 text-xs mb-2 font-mono">YOUR QUESTION:</div>
+                                <p className="text-white text-base font-light">{question}</p>
+                            </div>
+                            <div className={`bg-gradient-to-br ${currentFace.gradient} backdrop-blur-2xl rounded-3xl p-10 border-2 mb-6 relative overflow-hidden`} style={{
+                                borderColor: `${currentFace.glow}60`, boxShadow: `0 0 60px ${currentFace.glow}40, inset 0 0 60px ${currentFace.glow}10`
+                            }}>
+                                <div className="absolute top-0 left-0 w-20 h-20 border-t-2 border-l-2 rounded-tl-3xl" style={{borderColor:currentFace.glow}}></div>
+                                <div className="absolute bottom-0 right-0 w-20 h-20 border-b-2 border-r-2 rounded-br-3xl" style={{borderColor:currentFace.glow}}></div>
+                                <div className="relative">
+                                    <div className="flex items-center gap-4 mb-6">
+                                        <div className="w-4 h-4 rounded-full animate-pulse" style={{backgroundColor:currentFace.color,boxShadow:`0 0 20px ${currentFace.color}`}}></div>
+                                        <h2 className="text-5xl font-black tracking-tighter" style={{color:currentFace.color,textShadow:`0 0 30px ${currentFace.glow}`}}>{currentFace.title}</h2>
+                                    </div>
+                                    <p className="text-white text-2xl mb-8 leading-relaxed font-light">{currentFace.question}</p>
+                                    <textarea value={answer} onChange={(e)=>setAnswer(e.target.value)} placeholder="Type your thoughts..." className="w-full h-48 px-6 py-5 bg-black/40 border-2 rounded-2xl text-white placeholder-gray-500 focus:outline-none transition resize-none text-lg font-light backdrop-blur-sm" style={{
+                                        borderColor:`${currentFace.glow}30`, boxShadow:`inset 0 0 20px ${currentFace.glow}10`
+                                    }} />
+                                </div>
+                            </div>
+                            <button onClick={rotateCube} className="w-full py-6 rounded-2xl font-black text-2xl transition-all group relative overflow-hidden" style={{
+                                background: `linear-gradient(135deg, ${currentFace.color}, ${currentFace.glow})`,
+                                boxShadow: `0 0 40px ${currentFace.glow}80, 0 10px 30px ${currentFace.glow}40`
+                            }}>
+                                <span className="relative z-10 flex items-center justify-center gap-3 text-black tracking-wide">
+                                    <RotateCw className="w-7 h-7 group-hover:rotate-180 transition-transform duration-700" />
+                                    {currentFaceIndex < faces.length - 1 ? 'NEXT DIMENSION' : 'COMPLETE JOURNEY'}
+                                </span>
+                                <div className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity" style={{background:'radial-gradient(circle, white, transparent)'}}></div>
+                            </button>
+                        </div>
+                    </div>
+                );
+            }
+
+            if (stage === 'end') {
+                return (
+                    <div className="min-h-screen bg-black relative overflow-hidden flex items-center justify-center p-6">
+                        <div className="absolute inset-0">
+                            {faces.map((f,idx)=>(
+                                <div key={f.id} className="absolute w-96 h-96 rounded-full blur-3xl animate-pulse" style={{
+                                    backgroundColor:`${f.glow}20`, top:`${20+(idx%3)*30}%`, left:`${10+(idx%2)*40}%`, animationDelay:`${idx*0.5}s`
+                                }}></div>
+                            ))}
+                        </div>
+                        <div className="relative w-full max-w-3xl text-center z-10">
+                            <div className="mb-12">
+                                <div className="w-48 h-48 mx-auto mb-8 relative">
+                                    <div className="absolute inset-0 rounded-full animate-pulse" style={{
+                                        background:'conic-gradient(from 0deg, #00F5FF, #FF00FF, #00FF88, #FFD700, #8B00FF, #FF1744, #00F5FF)',
+                                        filter:'blur(40px)', opacity:0.6
+                                    }}></div>
+                                    <div className="relative w-full h-full bg-gradient-to-br from-cyan-500/30 to-purple-500/30 backdrop-blur-xl rounded-full border-4 border-cyan-400/50 flex items-center justify-center shadow-2xl">
+                                        <div className="text-9xl animate-bounce">✓</div>
+                                    </div>
+                                </div>
+                                <h2 className="text-6xl font-black mb-6 tracking-tight">
+                                    <span className="bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 text-transparent bg-clip-text">JOURNEY COMPLETE</span>
+                                </h2>
+                                <div className="max-w-2xl mx-auto mb-10">
+                                    <p className="text-3xl text-white leading-relaxed font-light mb-4">You've seen it from all sides.</p>
+                                    <p className="text-2xl text-gray-400 font-light">The decision is <span className="text-cyan-400">outside the screen</span>.</p>
+                                </div>
+                                <div className="inline-block px-8 py-4 bg-black/60 backdrop-blur-sm rounded-full border border-cyan-400/40 mb-12">
+                                    <span className="text-cyan-400 text-xl font-mono font-bold">6 DIMENSIONS EXPLORED</span>
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-3 gap-4 mb-12">
+                                {faces.map((f,idx)=>(
+                                    <div key={f.id} className="p-6 rounded-2xl backdrop-blur-sm border-2 transition-all hover:scale-105" style={{
+                                        background:`linear-gradient(135deg, ${f.color}20, ${f.color}10)`,
+                                        borderColor:`${f.color}40`, boxShadow:`0 0 20px ${f.glow}20`
+                                    }}>
+                                        <div className="text-xs text-gray-500 font-mono mb-2">DIM {idx+1}</div>
+                                        <div className="text-lg font-bold" style={{color:f.color}}>{f.title}</div>
+                                    </div>
+                                ))}
+                            </div>
+                            <button onClick={()=>{setStage('start');setQuestion('');setAnswer('');setCurrentFaceIndex(0);}} className="px-12 py-5 rounded-2xl font-bold text-xl transition-all bg-gradient-to-r from-cyan-500 to-purple-500 text-black hover:scale-105" style={{boxShadow:'0 0 40px rgba(0,245,255,0.6)'}}>
+                                NEW QUESTION
+                            </button>
+                        </div>
+                    </div>
+                );
+            }
+        }
+
+        ReactDOM.render(<PerspectiveCube />, document.getElementById('root'));
+    </script>
+</body>
+</html>
